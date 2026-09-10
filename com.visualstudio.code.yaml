@@ -18,6 +18,8 @@ finish-args:
   - --device=all
   - --allow=devel
   - --filesystem=host
+  - --filesystem=xdg-run/gnupg:ro
+  - --filesystem=xdg-config/kdeglobals:ro
   - --env=NPM_CONFIG_GLOBALCONFIG=/app/etc/npmrc
   - --env=LD_LIBRARY_PATH=/app/lib
   # required to fix cursor scaling on wayland
