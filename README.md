@@ -1,14 +1,67 @@
 # Visual Studio Code Flatpak<!-- omit in toc -->
 
-🚨 Warning: This is an unofficial Flatpak build of Visual Studio Code, generated from the official Microsoft-built .deb packages [here](https://github.com/flathub/com.visualstudio.code/blob/master/com.visualstudio.code.yaml#L103).
+🚨 Warning: This is an unofficial Flatpak build of Visual Studio Code, generated from the official Microsoft-built .deb packages [here](https://github.com/francoism90/com.visualstudio.code/blob/master/com.visualstudio.code.yaml#L103).
 
 ## Table of Contents<!-- omit in toc -->
 
+- [Quick Start](#quick-start)
+  - [Build](#build)
 - [Usage](#usage)
   - [Execute commands in the host system.](#execute-commands-in-the-host-system)
   - [Use host shell in the integrated terminal.](#use-host-shell-in-the-integrated-terminal)
   - [Support for language extension.](#support-for-language-extension)
 - [Support](#support)
+
+## Quick Start
+
+Add the remote repository:
+
+```bash
+flatpak remote-add --user --if-not-exists francoism90-vscode https://francoism90.github.io/com.visualstudio.code/index.flatpakrepo
+```
+
+Update the repository:
+
+```bash
+flatpak update
+```
+
+Install the app:
+
+```bash
+flatpak install francoism90-vscode com.visualstudio.code
+```
+
+> Note: the app will automatically update when you run `flatpak update`.
+
+```bash
+flatpak run com.visualstudio.code
+```
+
+### Build
+
+It is possible to build the app yourself instead of using the prebuilt, signed
+repo above.
+
+First, install `org.flatpak.Builder`:
+
+```bash
+flatpak install org.flatpak.Builder
+```
+
+Git clone the repository:
+
+```bash
+git clone https://github.com/francoism90/com.visualstudio.code.git
+cd com.visualstudio.code
+```
+
+Use Flatpak Builder to build and install the app:
+
+```bash
+flatpak run org.flatpak.Builder --install --user --force-clean --install-deps-from=flathub \
+  --repo=repo build-dir com.visualstudio.code.yaml
+```
 
 ## Usage
 
@@ -95,4 +148,4 @@ $ FLATPAK_ENABLE_SDK_EXT=dotnet,golang flatpak run com.visualstudio.code
 
 ## Support
 
-Please open issues under: https://github.com/flathub/com.visualstudio.code/issues
+Please open issues under: https://github.com/francoism90/com.visualstudio.code/issues
