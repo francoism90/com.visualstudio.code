@@ -176,6 +176,16 @@ $ flatpak install flathub org.freedesktop.Sdk.Extension.golang
 $ FLATPAK_ENABLE_SDK_EXT=dotnet,golang flatpak run com.visualstudio.code
 ```
 
+**Container support (Podman)**
+
+To use Podman as a container runtime inside the sandbox (e.g. for Dev Containers), install the [`org.freedesktop.Sdk.Extension.podman`](https://github.com/francoism90/org.freedesktop.Sdk.Extension.podman) SDK extension from its own repo (not on Flathub — see that repo for why) and enable it the same way:
+
+```
+$ flatpak remote-add --if-not-exists francoism90-podman https://francoism90.github.io/org.freedesktop.Sdk.Extension.podman/index.flatpakrepo
+$ flatpak install francoism90-podman org.freedesktop.Sdk.Extension.podman
+$ FLATPAK_ENABLE_SDK_EXT=podman flatpak run com.visualstudio.code
+```
+
 **Finding other SDK**
 
 `flatpak search <TEXT>`
