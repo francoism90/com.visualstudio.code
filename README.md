@@ -1,6 +1,6 @@
 # Visual Studio Code Flatpak<!-- omit in toc -->
 
-🚨 Warning: This is an unofficial Flatpak build of Visual Studio Code, generated from the official Microsoft-built .deb packages [here](https://github.com/francoism90/com.visualstudio.code/blob/master/com.visualstudio.code.yaml#L103).
+🚨 Warning: This is an unofficial Flatpak build of Visual Studio Code, generated from the official Microsoft-built [.deb packages](https://code.visualstudio.com/download). Use it at your own risk, it is recommended to build it yourself.
 
 ## Table of Contents<!-- omit in toc -->
 
@@ -9,9 +9,9 @@
     - [Nested-sandbox install error](#nested-sandbox-install-error)
   - [Signing](#signing)
 - [Usage](#usage)
-  - [Execute commands in the host system.](#execute-commands-in-the-host-system)
-  - [Use host shell in the integrated terminal.](#use-host-shell-in-the-integrated-terminal)
-  - [Support for language extension.](#support-for-language-extension)
+  - [Execute commands in the host system](#execute-commands-in-the-host-system)
+  - [Use host shell in the integrated terminal](#use-host-shell-in-the-integrated-terminal)
+  - [Support for language extension](#support-for-language-extension)
 - [Support](#support)
 
 ## Quick Start
@@ -54,7 +54,8 @@ flatpak run com.visualstudio.code
 
 `build.sh` adds the Flathub remote (user), builds to a local repo, then
 installs from that repo with the host's own `flatpak` binary (see
-"Nested-sandbox install error" below for why it's split into two steps).
+[Nested-sandbox install error](#nested-sandbox-install-error) below for why
+it's split into two steps).
 
 To build manually:
 
@@ -71,7 +72,7 @@ If `flatpak-builder` on your `$PATH` is itself a Flatpak (`org.flatpak.Builder`,
 e.g. on immutable/hardened distros without a native package), running it with
 `--install` directly can fail with:
 
-```
+```text
 bwrap: No permissions to create a new namespace, likely because the kernel
 does not allow non-privileged user namespaces.
 Error: Failed to install com.visualstudio.code: ...
@@ -80,7 +81,7 @@ Error: Failed to install com.visualstudio.code: ...
 That's `org.flatpak.Builder`'s own sandbox trying to nest another `bwrap`
 sandbox for `flatpak install`, which some kernels/hardening policies block
 regardless of user-namespace permissions otherwise being fine. Building to a
-local repo and installing with the *host's* `flatpak` binary — as `build.sh`
+local repo and installing with the _host's_ `flatpak` binary — as `build.sh`
 and the manual steps above do — sidesteps it, since that install then only
 needs one level of sandboxing, not two.
 
@@ -101,19 +102,19 @@ This prints the values to add as repo secrets. Delete `private.key` and the
 
 Most functionality works out of the box, though please note that flatpak runs in an isolated environment and some work is necessary to enable those features.
 
-### Execute commands in the host system.
+### Execute commands in the host system
 
 To execute commands on the host system, run inside the sandbox:
 
-`$ flatpak-spawn --host <COMMAND>`
+`flatpak-spawn --host <COMMAND>`
 
 or
 
-`$ host-spawn <COMMAND>`
+`host-spawn <COMMAND>`
 
 - Most users seem to report a better experience with `host-spawn`
 
-### Use host shell in the integrated terminal.
+### Use host shell in the integrated terminal
 
 Another option to execute commands is to use your host shell in the integrated terminal instead of the sandbox one.
 
@@ -121,9 +122,9 @@ For that go to `File -> Preferences -> Settings` and find `Features > Terminal >
 
 And make sure that you have the following lines there:
 
-`flatpak-spawn --host`
+**Using `flatpak-spawn`:**
 
-```
+```json
 {
   "terminal.integrated.defaultProfile.linux": "bash",
   "terminal.integrated.profiles.linux": {
@@ -137,9 +138,9 @@ And make sure that you have the following lines there:
 }
 ```
 
-`host-spawn`
+**Using `host-spawn`:**
 
-```
+```json
 {
   "terminal.integrated.defaultProfile.linux": "bash",
   "terminal.integrated.profiles.linux": {
@@ -156,40 +157,36 @@ And make sure that you have the following lines there:
 - You can change **bash** to any terminal you are using: zsh, fish, sh.
 - `overrideName` allows for the 'name' (or whatever you set it to) of the shell you're using to appear (e.g. normally zsh, fish, sh).
 
-### Support for language extension.
+### Support for language extension
 
-Some Visual Studio extension depends on packages that might exist on your host, but they are not accessible thought Flatpak. Like support to programming languages: gcc, python, etc..
+Some Visual Studio extensions depend on packages that might exist on your host, but they are not accessible through Flatpak. Like support for programming languages: gcc, python, etc.
 
 **See available SDK:**
 
-```
-$ flatpak run --command=sh com.visualstudio.code
-$ ls /usr/bin (shared runtime)
-$ ls /app/bin (bundled with this flatpak)
-```
-
-**Getting support for additional languages, you have to install SDK extensions, e.g.**
-
-```
-$ flatpak install flathub org.freedesktop.Sdk.Extension.dotnet
-$ flatpak install flathub org.freedesktop.Sdk.Extension.golang
-$ FLATPAK_ENABLE_SDK_EXT=dotnet,golang flatpak run com.visualstudio.code
+```bash
+flatpak run --command=sh com.visualstudio.code
+ls /usr/bin # shared runtime
+ls /app/bin # bundled with this flatpak
 ```
 
-**Container support (Podman)**
+**Getting support for additional languages, you have to install SDK extensions, e.g.:**
+
+```bash
+flatpak install flathub org.freedesktop.Sdk.Extension.dotnet
+flatpak install flathub org.freedesktop.Sdk.Extension.golang
+FLATPAK_ENABLE_SDK_EXT=dotnet,golang flatpak run com.visualstudio.code
+```
+
+**Container support (Podman):**
 
 To use Podman as a container runtime inside the sandbox (e.g. for Dev Containers), install the [`org.freedesktop.Sdk.Extension.podman`](https://github.com/francoism90/org.freedesktop.Sdk.Extension.podman) SDK extension from its own repo (not on Flathub — see that repo for why) and enable it the same way:
 
-```
-$ flatpak remote-add --if-not-exists francoism90-podman https://francoism90.github.io/org.freedesktop.Sdk.Extension.podman/index.flatpakrepo
-$ flatpak install francoism90-podman org.freedesktop.Sdk.Extension.podman
-$ FLATPAK_ENABLE_SDK_EXT=podman flatpak run com.visualstudio.code
+```bash
+flatpak remote-add --if-not-exists francoism90-podman https://francoism90.github.io/org.freedesktop.Sdk.Extension.podman/index.flatpakrepo
+flatpak install francoism90-podman org.freedesktop.Sdk.Extension.podman
+FLATPAK_ENABLE_SDK_EXT=podman flatpak run com.visualstudio.code
 ```
 
-**Finding other SDK**
+**Finding other SDK:**
 
 `flatpak search <TEXT>`
-
-## Support
-
-Please open issues under: https://github.com/francoism90/com.visualstudio.code/issues
