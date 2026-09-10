@@ -6,6 +6,7 @@
 
 - [Quick Start](#quick-start)
   - [Build](#build)
+  - [Signing](#signing)
 - [Usage](#usage)
   - [Execute commands in the host system.](#execute-commands-in-the-host-system)
   - [Use host shell in the integrated terminal.](#use-host-shell-in-the-integrated-terminal)
@@ -62,6 +63,19 @@ Use Flatpak Builder to build and install the app:
 flatpak run org.flatpak.Builder --install --user --force-clean --install-deps-from=flathub \
   --repo=repo build-dir com.visualstudio.code.yaml
 ```
+
+### Signing
+
+The signed repo published to GitHub Pages by `.github/workflows/flatter.yml`
+needs a GPG key in the `GPG_PRIVATE_KEY` (and optionally `GPG_PASSPHRASE`)
+repo secrets. Generate one with:
+
+```bash
+bin/create-keys "Your Name" "you@example.com"
+```
+
+This prints the values to add as repo secrets. Delete `private.key` and the
+`flatter-keyring/` directory afterwards — never commit them.
 
 ## Usage
 
