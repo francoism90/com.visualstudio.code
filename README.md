@@ -6,6 +6,7 @@
 
 - [Quick Start](#quick-start)
   - [Build](#build)
+    - [Nested-sandbox install error](#nested-sandbox-install-error)
   - [Signing](#signing)
 - [Usage](#usage)
   - [Execute commands in the host system.](#execute-commands-in-the-host-system)
@@ -44,25 +45,44 @@ flatpak run com.visualstudio.code
 It is possible to build the app yourself instead of using the prebuilt, signed
 repo above.
 
-First, install `org.flatpak.Builder`:
-
-```bash
-flatpak install org.flatpak.Builder
-```
-
-Git clone the repository:
-
 ```bash
 git clone https://github.com/francoism90/com.visualstudio.code.git
 cd com.visualstudio.code
+./build.sh
+flatpak run com.visualstudio.code
 ```
 
-Use Flatpak Builder to build and install the app:
+`build.sh` adds the Flathub remote (user), builds to a local repo, then
+installs from that repo with the host's own `flatpak` binary (see
+"Nested-sandbox install error" below for why it's split into two steps).
+
+To build manually:
 
 ```bash
-flatpak run org.flatpak.Builder --install --user --force-clean --install-deps-from=flathub \
-  --repo=repo build-dir com.visualstudio.code.yaml
+flatpak run org.flatpak.Builder --user --install-deps-from=flathub --force-clean --repo=repo \
+  build-dir com.visualstudio.code.yaml
+flatpak --user remote-add --if-not-exists com.visualstudio.code-local ./repo --no-gpg-verify
+flatpak --user install --noninteractive com.visualstudio.code-local com.visualstudio.code
 ```
+
+#### Nested-sandbox install error
+
+If `flatpak-builder` on your `$PATH` is itself a Flatpak (`org.flatpak.Builder`,
+e.g. on immutable/hardened distros without a native package), running it with
+`--install` directly can fail with:
+
+```
+bwrap: No permissions to create a new namespace, likely because the kernel
+does not allow non-privileged user namespaces.
+Error: Failed to install com.visualstudio.code: ...
+```
+
+That's `org.flatpak.Builder`'s own sandbox trying to nest another `bwrap`
+sandbox for `flatpak install`, which some kernels/hardening policies block
+regardless of user-namespace permissions otherwise being fine. Building to a
+local repo and installing with the *host's* `flatpak` binary — as `build.sh`
+and the manual steps above do — sidesteps it, since that install then only
+needs one level of sandboxing, not two.
 
 ### Signing
 
