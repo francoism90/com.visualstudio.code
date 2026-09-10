@@ -1,14 +1,101 @@
 # Visual Studio Code Flatpak<!-- omit in toc -->
 
-🚨 Warning: This is an unofficial Flatpak build of Visual Studio Code, generated from the official Microsoft-built .deb packages [here](https://github.com/flathub/com.visualstudio.code/blob/master/com.visualstudio.code.yaml#L103).
+🚨 Warning: This is an unofficial Flatpak build of Visual Studio Code, generated from the official Microsoft-built .deb packages [here](https://github.com/francoism90/com.visualstudio.code/blob/master/com.visualstudio.code.yaml#L103).
 
 ## Table of Contents<!-- omit in toc -->
 
+- [Quick Start](#quick-start)
+  - [Build](#build)
+    - [Nested-sandbox install error](#nested-sandbox-install-error)
+  - [Signing](#signing)
 - [Usage](#usage)
   - [Execute commands in the host system.](#execute-commands-in-the-host-system)
   - [Use host shell in the integrated terminal.](#use-host-shell-in-the-integrated-terminal)
   - [Support for language extension.](#support-for-language-extension)
 - [Support](#support)
+
+## Quick Start
+
+Add the remote repository:
+
+```bash
+flatpak remote-add --user --if-not-exists francoism90-vscode https://francoism90.github.io/com.visualstudio.code/index.flatpakrepo
+```
+
+Update the repository:
+
+```bash
+flatpak update
+```
+
+Install the app:
+
+```bash
+flatpak install francoism90-vscode com.visualstudio.code
+```
+
+> Note: the app will automatically update when you run `flatpak update`.
+
+```bash
+flatpak run com.visualstudio.code
+```
+
+### Build
+
+It is possible to build the app yourself instead of using the prebuilt, signed
+repo above.
+
+```bash
+git clone https://github.com/francoism90/com.visualstudio.code.git
+cd com.visualstudio.code
+./build.sh
+flatpak run com.visualstudio.code
+```
+
+`build.sh` adds the Flathub remote (user), builds to a local repo, then
+installs from that repo with the host's own `flatpak` binary (see
+"Nested-sandbox install error" below for why it's split into two steps).
+
+To build manually:
+
+```bash
+flatpak run org.flatpak.Builder --user --install-deps-from=flathub --force-clean --repo=repo \
+  build-dir com.visualstudio.code.yaml
+flatpak --user remote-add --if-not-exists com.visualstudio.code-local ./repo --no-gpg-verify
+flatpak --user install --noninteractive com.visualstudio.code-local com.visualstudio.code
+```
+
+#### Nested-sandbox install error
+
+If `flatpak-builder` on your `$PATH` is itself a Flatpak (`org.flatpak.Builder`,
+e.g. on immutable/hardened distros without a native package), running it with
+`--install` directly can fail with:
+
+```
+bwrap: No permissions to create a new namespace, likely because the kernel
+does not allow non-privileged user namespaces.
+Error: Failed to install com.visualstudio.code: ...
+```
+
+That's `org.flatpak.Builder`'s own sandbox trying to nest another `bwrap`
+sandbox for `flatpak install`, which some kernels/hardening policies block
+regardless of user-namespace permissions otherwise being fine. Building to a
+local repo and installing with the *host's* `flatpak` binary — as `build.sh`
+and the manual steps above do — sidesteps it, since that install then only
+needs one level of sandboxing, not two.
+
+### Signing
+
+The signed repo published to GitHub Pages by `.github/workflows/flatter.yml`
+needs a GPG key in the `GPG_PRIVATE_KEY` (and optionally `GPG_PASSPHRASE`)
+repo secrets. Generate one with:
+
+```bash
+bin/create-keys "Your Name" "you@example.com"
+```
+
+This prints the values to add as repo secrets. Delete `private.key` and the
+`flatter-keyring/` directory afterwards — never commit them.
 
 ## Usage
 
@@ -95,4 +182,4 @@ $ FLATPAK_ENABLE_SDK_EXT=dotnet,golang flatpak run com.visualstudio.code
 
 ## Support
 
-Please open issues under: https://github.com/flathub/com.visualstudio.code/issues
+Please open issues under: https://github.com/francoism90/com.visualstudio.code/issues
