@@ -60,6 +60,13 @@ for i in "${SDK[@]}"; do
   fi
 done
 
+# On NixOS, /etc/shells is a symlink to /etc/static/shells. Since symlink
+# targets resolve in the sandbox's own root, not relative to /var/run/host,
+# that inner hop 404s unless /etc/static/shells also exists in the sandbox.
+if [ ! -e /etc/static/shells ] && [ -e /var/run/host/etc/static/shells ]; then
+  ln -s /var/run/host/etc/static/shells /etc/static/shells
+fi
+
 if [ ! -e /etc/shells ] && [ -e /var/run/host/etc/shells ]; then
   ln -s /var/run/host/etc/shells /etc/shells
 fi
